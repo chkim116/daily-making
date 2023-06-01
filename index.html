@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>일일업무 기록용 템플릿 생성기</title>
+  <script type="text/javascript">
+    function init() {
+      const date = new Date();
+      const elemYear = document.querySelector('input[name="year"]');
+      const elemMonth = document.querySelector('input[name="month"]');
+      const elemSubmit = document.querySelector('form button[type="submit"]');
+
+      elemYear.value = date.getFullYear().toString();
+      elemMonth.value = (date.getMonth() + 1).toString();
+      elemSubmit.focus();
+    }
+    function numberFormat(num) {
+      if (num < 10) {
+        return `0${num}`;
+      }
+      return num.toString();
+    }
+    function getWeekly(week) {
+      const dic = {
+        0: '일',
+        1: '월',
+        2: '화',
+        3: '수',
+        4: '목',
+        5: '금',
+        6: '토'
+      };
+
+      return dic[week];
+    }
+    function makeDaily(year, month) {
+      const date = new Date(year, month - 1, 1);
+      console.log(date.getDay);
+      const maxDate = new Date(year, month, 0);
+      const arr = Array(maxDate.getDate()).fill('');
+      const startWeek = date.getDay();
+
+      console.log(startWeek)
+
+      return arr.map((_, item) => {
+        const week = (startWeek + item) % 7;
+
+        if (week === 6 || week === 0) {
+          return '';
+        }
+
+        let ret = `## ${numberFormat(month)}/${numberFormat(item + 1)} (${getWeekly(week)})\n\n\n`;
+
+        if (week === 5) {
+          ret += '------------------------------\n\n\n';
+        }
+
+        return ret;
+      }).join('');
+    }
+    function render() {
+      const year = Number(document.querySelector('input[name=year]').value);
+      const month = Number(document.querySelector('input[name=month]').value);
+
+      document.querySelector('#print').value = makeDaily(year, month);
+    }
+    function doSubmit(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      render();
+
+      return false;
+    }
+  </script>
+</head>
+<body onload="init()">
+  <form onsubmit="doSubmit(event)">
+    <input type="number" name="year" value="2023"> 년
+    <input type="number" name="month" value="3"> 월
+    <br>
+    <button type="submit">만들기</button><br/>
+  </form>
+
+  <textarea id="print" style="width: 80%; height: 100em;"></textarea>
+</body>
+</html>
